@@ -19,6 +19,7 @@ const CLIENT_INFO = { name: 'nango-agent-session', version: '1.0.0' };
 const PROXY_PLACEHOLDER_URL = new URL('https://nango-proxy.invalid/');
 
 const MAX_TOOL_LIST_PAGES = 20;
+export const TOOL_CALL_TIMEOUT_MS = 60_000;
 
 export interface RemoteMcpTool {
     name: string;
@@ -158,7 +159,7 @@ export async function callRemoteTool(
 ): Promise<Result<CallToolResult, RemoteMcpError>> {
     let result: CallToolResult;
     try {
-        result = (await client.callTool({ name, arguments: args })) as CallToolResult;
+        result = (await client.callTool({ name, arguments: args }, { timeout: TOOL_CALL_TIMEOUT_MS })) as CallToolResult;
     } catch (err) {
         return Err(toRemoteMcpError(err, 'tools/call'));
     }
