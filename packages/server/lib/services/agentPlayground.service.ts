@@ -161,7 +161,17 @@ export function sessionOwner(session: Pick<AgentSession, 'metaTools'>): string |
     return session.metaTools.nangoCreateConnection.tags[PLAYGROUND_USER_TAG_KEY];
 }
 
-async function getOrCreateSession(ctx: PlaygroundContext, sessionId: string | undefined): Promise<Result<AgentSession, AgentPlaygroundError>> {
+// A session's toolset is compiled once, so an integration added or deleted later needs a new session.
+export function hasSameIntegrations(session: Pick<AgentSession, 'compiledToolset'>, integrations: { unique_key: string }[]): boolean {
+    const compiled = Object.keys(session.compiledToolset);
+    return compiled.length === integrations.length && integrations.every((integration) => Object.hasOwn(session.compiledToolset, integration.unique_key));
+}
+
+async function getOrCreateSession(
+    ctx: PlaygroundContext,
+    sessionId: string | undefined,
+    integrations: { unique_key: string }[]
+): Promise<Result<AgentSession, AgentPlaygroundError>> {
     if (sessionId) {
         const existing = await agentSessionService.getAgentSession(db.knex, { id: sessionId, accountId: ctx.account.id, environmentId: ctx.environment.id });
         if (
@@ -170,13 +180,13 @@ async function getOrCreateSession(ctx: PlaygroundContext, sessionId: string | un
             existing.value.expiresAt > new Date() &&
             sessionOwner(existing.value) === ctx.user.uuid &&
             // Connections a session creates must stay in the user's scope, which follows their current email.
-            existing.value.metaTools.nangoCreateConnection.tags['end_user_email'] === ctx.user.email
+            existing.value.metaTools.nangoCreateConnection.tags['end_user_email'] === ctx.user.email &&
+            hasSameIntegrations(existing.value, integrations)
         ) {
             return Ok(existing.value);
         }
     }
 
-    const integrations = await configService.listProviderConfigs(db.knex, ctx.environment.id);
     const connections = await connectionService.listConnections({
         environmentId: ctx.environment.id,
         integrationIds: integrations.map((integration) => integration.unique_key),
@@ -325,8 +335,9 @@ export async function startTurn({
     const starterProvider = lastMessage?.role === 'user' ? lastMessage.metadata?.starterProvider : undefined;
     const integrationSetup =
         starterProvider && PLAYGROUND_PROVIDERS.includes(starterProvider) ? await setUpStarterIntegration(ctx.environment, starterProvider) : undefined;
-    // A new integration only reaches a session compiled after it exists.
-    const session = await getOrCreateSession(ctx, integrationSetup ? undefined : sessionId);
+    // Read after the starter setup, so an integration it creates is part of the list.
+    const integrations = await configService.listProviderConfigs(db.knex, ctx.environment.id);
+    const session = await getOrCreateSession(ctx, sessionId, integrations);
     if (session.isErr()) {
         return Err(session.error);
     }
@@ -359,9 +370,8 @@ export async function startTurn({
         await client.connect(clientTransport);
         let mcpTools: ToolSet;
         let connections: Awaited<ReturnType<typeof connectionService.listConnections>>;
-        let integrations: Awaited<ReturnType<typeof configService.listProviderConfigs>>;
         // Read live: the session's own connection list only fills in once a tool uses a connection.
-        [mcpTools, modelMessages, connections, integrations] = await Promise.all([
+        [mcpTools, modelMessages, connections] = await Promise.all([
             buildMcpTools(client),
             convertToModelMessages(
                 // A setup-only reply, or a Stop before the first part, leaves an assistant message with no parts. OpenAI rejects an empty turn.
@@ -373,8 +383,7 @@ export async function startTurn({
                 environmentId: ctx.environment.id,
                 integrationIds: Object.keys(session.value.compiledToolset),
                 tags: playgroundConnectionScope(ctx.user)
-            }),
-            configService.listProviderConfigs(db.knex, ctx.environment.id)
+            })
         ]);
         connected = new Set(connections.map(({ connection }) => connection.provider_config_key));
         unfinished = new Map(
