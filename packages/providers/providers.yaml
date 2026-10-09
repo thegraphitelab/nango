@@ -23363,6 +23363,102 @@ servicenow-oauth2-cc:
             secret: true
             doc_section: '#step-4-create-an-oauth-application'
 
+servicetitan:
+    display_name: ServiceTitan
+    categories:
+        - crm
+        - erp
+    auth_mode: OAUTH2_CC
+    token_url: https://auth.servicetitan.io/connect/token
+    token_params:
+        grant_type: client_credentials
+    proxy:
+        base_url: https://api.servicetitan.io
+        headers:
+            st-app-key: ${connectionConfig.appKey}
+        retry:
+            after:
+                - 'retry-after'
+    docs: https://nango.dev/docs/api-integrations/servicetitan
+    docs_connect: https://nango.dev/docs/api-integrations/servicetitan/connect
+    setup_guide_url: https://nango.dev/docs/api-integrations/servicetitan/how-to-register-your-own-servicetitan-app
+    connection_config:
+        tenantId:
+            type: string
+            title: Tenant ID
+            description: The numeric ID of the ServiceTitan tenant to connect.
+            example: '1234567890'
+            pattern: '^\d+$'
+            order: 1
+            doc_section: '#step-2-find-your-tenant-id'
+        appKey:
+            type: string
+            title: App Key
+            description: The application key of the ServiceTitan app, sent as the ST-App-Key header. Usually prefilled by the application you are connecting.
+            example: ak1.abc123********
+            order: 2
+            doc_section: '#step-3-enter-your-app-key'
+    credentials:
+        client_id:
+            type: string
+            title: Client ID
+            description: The client ID ServiceTitan generated when you connected the app.
+            doc_section: '#step-1-generate-a-client-id-and-secret'
+        client_secret:
+            type: string
+            title: Client Secret
+            description: The client secret ServiceTitan generated when you connected the app.
+            secret: true
+            doc_section: '#step-1-generate-a-client-id-and-secret'
+
+servicetitan-sandbox:
+    display_name: ServiceTitan (Sandbox)
+    categories:
+        - crm
+        - erp
+    auth_mode: OAUTH2_CC
+    token_url: https://auth-integration.servicetitan.io/connect/token
+    token_params:
+        grant_type: client_credentials
+    proxy:
+        base_url: https://api-integration.servicetitan.io
+        headers:
+            st-app-key: ${connectionConfig.appKey}
+        retry:
+            after:
+                - 'retry-after'
+    docs: https://nango.dev/docs/api-integrations/servicetitan-sandbox
+    docs_connect: https://nango.dev/docs/api-integrations/servicetitan-sandbox/connect
+    setup_guide_url: https://nango.dev/docs/api-integrations/servicetitan/how-to-register-your-own-servicetitan-app
+    connection_config:
+        tenantId:
+            type: string
+            title: Tenant ID
+            description: The numeric ID of the ServiceTitan integration environment tenant to connect.
+            example: '1234567890'
+            pattern: '^\d+$'
+            order: 1
+            doc_section: '#step-2-find-your-tenant-id'
+        appKey:
+            type: string
+            title: App Key
+            description: The application key of the ServiceTitan app, sent as the ST-App-Key header. Usually prefilled by the application you are connecting.
+            example: ak1.abc123********
+            order: 2
+            doc_section: '#step-3-enter-your-app-key'
+    credentials:
+        client_id:
+            type: string
+            title: Client ID
+            description: The client ID ServiceTitan generated in the integration environment when you connected the app.
+            doc_section: '#step-1-generate-a-client-id-and-secret'
+        client_secret:
+            type: string
+            title: Client Secret
+            description: The client secret ServiceTitan generated in the integration environment when you connected the app.
+            secret: true
+            doc_section: '#step-1-generate-a-client-id-and-secret'
+
 skio:
     display_name: Skio
     categories:

@@ -1,0 +1,94 @@
+---
+title: 'ServiceTitan'
+sidebarTitle: 'ServiceTitan'
+description: 'Integrate your application with the ServiceTitan API'
+---
+
+## 🚀 Quickstart
+
+Connect to ServiceTitan with Nango and see data flow in 2 minutes.
+
+<Steps>
+    <Step title="Create the integration">
+    In Nango ([free signup](https://app.nango.dev)), go to [Integrations](https://app.nango.dev/dev/integrations) -> _Configure New Integration_ -> _ServiceTitan_.
+    </Step>
+    <Step title="Authorize ServiceTitan">
+    Go to [Connections](https://app.nango.dev/dev/connections) -> _Add Test Connection_ -> _Authorize_, then enter the tenant's **Client ID**, **Client Secret**, and **Tenant ID**, plus your app's **App Key**. Later, you'll let your users do the same directly from your app.
+    </Step>
+    <Step title="Call the ServiceTitan API">
+    Let's make your first request to the ServiceTitan API. Replace the placeholders below with your [Environment API key](/reference/backend/http-api/api-keys), [integration ID](https://app.nango.dev/dev/integrations), [connection ID](https://app.nango.dev/dev/connections), and the connection's tenant ID:
+    <Tabs>
+        <Tab title="cURL">
+
+            ```bash
+            curl "https://api.nango.dev/proxy/settings/v2/tenant/<TENANT-ID>/employees?pageSize=10" \
+              -H "Authorization: Bearer <NANGO-API-KEY>" \
+              -H "Provider-Config-Key: <INTEGRATION-ID>" \
+              -H "Connection-Id: <CONNECTION-ID>"
+            ```
+
+        </Tab>
+
+        <Tab title="Node">
+
+        Install Nango's backend SDK with `npm i @nangohq/node`. Then run:
+
+        ```typescript
+        import { Nango } from '@nangohq/node';
+
+        const nango = new Nango({ apiKey: '<NANGO-API-KEY>' });
+
+        const res = await nango.get({
+            endpoint: '/settings/v2/tenant/<TENANT-ID>/employees',
+            params: { pageSize: '10' },
+            providerConfigKey: '<INTEGRATION-ID>',
+            connectionId: '<CONNECTION-ID>'
+        });
+
+        console.log(res.data);
+        ```
+        </Tab>
+
+
+    </Tabs>
+    Or fetch credentials with the [Node SDK](/reference/backend/backend-sdk/node#get-a-connection-with-credentials) or [API](/reference/backend/http-api/connections/get).
+
+    ✅ You're connected! Check the [Logs](https://app.nango.dev/dev/logs) tab in Nango to inspect requests.
+    </Step>
+
+    <Step title="Implement Nango in your app">
+        Follow our [Auth implementation guide](/guides/auth/auth-guide) to integrate Nango in your app.
+
+        To register your own ServiceTitan app and get an app key, follow the setup guide linked below.
+    </Step>
+</Steps>
+
+## 📚 ServiceTitan Integration Guides
+
+Nango maintained guides for common use cases.
+
+- [How to register your own ServiceTitan app](/api-integrations/servicetitan/how-to-register-your-own-servicetitan-app)
+Register an app in the ServiceTitan Developer Portal, get your app key, and pre-fill it in connect sessions
+
+- [How do I link my account?](/api-integrations/servicetitan/connect)
+Generate a client ID and secret in ServiceTitan and find your tenant ID
+
+Official docs: [ServiceTitan API docs](https://developer.servicetitan.io/docs/welcome/)
+
+## 🔌 Calling the ServiceTitan API
+
+- **Tenant in the path.** ServiceTitan endpoints look like `/<module>/v2/tenant/<TENANT-ID>/<resource>`, for example `/jpm/v2/tenant/<TENANT-ID>/jobs`. Nango stores the tenant ID on the connection as `tenantId`.
+- **App key header.** ServiceTitan requires an `ST-App-Key` header on every call. Nango adds it from the connection's `appKey`, so you don't send it yourself.
+- **Access tokens.** ServiceTitan uses the OAuth 2.0 client credentials grant. Tokens last 15 minutes, and Nango fetches a new one when needed.
+- **Rate limits.** When ServiceTitan returns `429`, Nango waits for the `Retry-After` header before retrying.
+- **Multiple tenants.** ServiceTitan issues a client ID and secret per tenant, so the usual setup is one Nango connection per tenant. If an organization's tenants share one client ID and secret, one connection can call each of those tenants by putting that tenant's ID in the path.
+
+## 🧩 Pre-built syncs & actions for ServiceTitan
+
+Enable them in your dashboard. Extend and customize to fit your needs.
+
+import PreBuiltUseCases from "/snippets/generated/servicetitan/PreBuiltUseCases.mdx"
+
+<PreBuiltUseCases />
+
+---

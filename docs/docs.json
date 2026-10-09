@@ -1830,6 +1830,8 @@
               "api-integrations/servicenow",
               "api-integrations/servicenow-jwt",
               "api-integrations/servicenow-oauth2-cc",
+              "api-integrations/servicetitan",
+              "api-integrations/servicetitan-sandbox",
               "integrations/all/setmore",
               "api-integrations/sharepoint-online",
               "integrations/all/sharepoint-online-oauth2-cc",

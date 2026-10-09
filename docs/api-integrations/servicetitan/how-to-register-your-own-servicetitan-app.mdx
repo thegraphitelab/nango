@@ -1,0 +1,61 @@
+---
+title: 'How to register your own ServiceTitan app'
+sidebarTitle: 'ServiceTitan setup'
+description: 'Register an app in the ServiceTitan Developer Portal and connect it to Nango'
+---
+
+This guide shows you how to register your own app in the ServiceTitan Developer Portal and get its app key. ServiceTitan uses the OAuth 2.0 client credentials grant: your app has one app key, and each customer tenant that connects your app gets its own client ID and secret.
+
+<Steps>
+  <Step id="get-developer-access" title="Get Developer Portal access">
+    Sign in to the [ServiceTitan Developer Portal](https://developer.servicetitan.io) with **Login to My Apps**.
+
+    - **Third-party developers** get an integration environment from ServiceTitan. Request one from the Developer Portal with **Request Access**. ServiceTitan's API terms require third parties to register apps only in that integration environment, never in a customer's account.
+    - **ServiceTitan customers** building for their own company sign in as an integration or production environment user. A ServiceTitan admin must grant the **Generate API Application Key** permission first.
+  </Step>
+  <Step id="register-app" title="Register a new app">
+    1. On the **My Apps** tab, click **Register New App**.
+    2. Enter the application name, organization name, and your organization's home page URL.
+    3. Under **Tenant(s)**, add the tenant ID of each customer who should be able to see and connect your app. You can add or remove tenant IDs at any time.
+    4. Under **API Scopes**, select the APIs and endpoints your app needs.
+    5. Under **Client Credentials Management**, select **Tenants will configure the credentials themselves**. Customers then generate their client ID and secret in ServiceTitan and enter them in Nango's Connect UI.
+    6. Save the app.
+
+    <Note>
+      ServiceTitan reviews new public apps once a week. Customers can't see your app in their **API Application Access** settings until the review is done. This is a one-time review: adding tenant IDs or changing scopes later doesn't need another one.
+    </Note>
+  </Step>
+  <Step id="copy-app-key" title="Copy your app key">
+    Open your app and copy the key under **Keys** > **Application Key**. It starts with `ak1.`.
+
+    The app key isn't environment specific: a key generated in the integration environment also works for production calls, and vice versa.
+  </Step>
+  <Step id="prefill-app-key" title="Pre-fill the app key in connect sessions">
+    The app key belongs to you, not your customers. Set it when you [create the connect session](/reference/backend/http-api/connect/sessions/create) so the Connect UI hides the **App Key** field:
+
+    ```json
+    {
+        "integrations_config_defaults": {
+            "<INTEGRATION-ID>": {
+                "connection_config": {
+                    "appKey": "<YOUR-APP-KEY>"
+                }
+            }
+        }
+    }
+    ```
+
+    If you already know the customer's tenant ID, add `"tenantId": "<TENANT-ID>"` to the same object and the Connect UI hides that field too.
+  </Step>
+  <Step id="next" title="Next">
+    Follow the [_Quickstart_](/getting-started/quickstart) to connect your first account.
+  </Step>
+</Steps>
+
+## Good to know
+
+- **Environments.** Client IDs, client secrets, and access tokens only work in the environment where they were created. Use the **ServiceTitan** integration for production tenants and **ServiceTitan (Sandbox)** for integration environment tenants, with a separate Nango integration for each.
+- **Credentials you generate yourself.** If you selected **I, the app developer, will configure the credentials on behalf of each tenant**, generate each tenant's client ID and secret from **My Apps** > **View Connections** after the tenant connects your app. Then create the connection with those values instead of asking the customer.
+- **One connection per tenant.** ServiceTitan issues a client ID and secret per tenant. Organizations with several tenants connect each one separately.
+
+For more details, see [ServiceTitan's API documentation](https://developer.servicetitan.io/docs/welcome/).
