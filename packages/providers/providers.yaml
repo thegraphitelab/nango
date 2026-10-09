@@ -23389,15 +23389,12 @@ servicetitan:
             description: The numeric ID of the ServiceTitan tenant to connect.
             example: '1234567890'
             pattern: '^\d+$'
-            order: 1
             doc_section: '#step-2-find-your-tenant-id'
         appKey:
             type: string
             title: App Key
-            description: The application key of the ServiceTitan app, sent as the ST-App-Key header. Usually prefilled by the application you are connecting.
-            example: ak1.abc123********
-            order: 2
-            doc_section: '#step-3-enter-your-app-key'
+            description: Your ServiceTitan app key, sent as the ST-App-Key header. Set it in the connect session's integrations_config_defaults; end users never see it.
+            automated: true
     credentials:
         client_id:
             type: string
@@ -23437,15 +23434,12 @@ servicetitan-sandbox:
             description: The numeric ID of the ServiceTitan integration environment tenant to connect.
             example: '1234567890'
             pattern: '^\d+$'
-            order: 1
             doc_section: '#step-2-find-your-tenant-id'
         appKey:
             type: string
             title: App Key
-            description: The application key of the ServiceTitan app, sent as the ST-App-Key header. Usually prefilled by the application you are connecting.
-            example: ak1.abc123********
-            order: 2
-            doc_section: '#step-3-enter-your-app-key'
+            description: Your ServiceTitan app key, sent as the ST-App-Key header. Set it in the connect session's integrations_config_defaults; end users never see it.
+            automated: true
     credentials:
         client_id:
             type: string

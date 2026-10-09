@@ -30,8 +30,8 @@ This guide shows you how to register your own app in the ServiceTitan Developer 
 
     The app key isn't environment specific: a key generated in the integration environment also works for production calls, and vice versa.
   </Step>
-  <Step id="prefill-app-key" title="Pre-fill the app key in connect sessions">
-    The app key belongs to you, not your customers. Set it when you [create the connect session](/reference/backend/http-api/connect/sessions/create) so the Connect UI hides the **App Key** field:
+  <Step id="prefill-app-key" title="Set the app key in every connect session">
+    The app key belongs to you, not your customers, so the Connect UI never asks for it. Pass it every time you [create a connect session](/reference/backend/http-api/connect/sessions/create). Without it, Nango can't send the `ST-App-Key` header and ServiceTitan rejects the calls.
 
     ```json
     {
@@ -55,7 +55,7 @@ This guide shows you how to register your own app in the ServiceTitan Developer 
 ## Good to know
 
 - **Environments.** Client IDs, client secrets, and access tokens only work in the environment where they were created. Use the **ServiceTitan** integration for production tenants and **ServiceTitan (Sandbox)** for integration environment tenants, with a separate Nango integration for each.
-- **Credentials you generate yourself.** If you selected **I, the app developer, will configure the credentials on behalf of each tenant**, generate each tenant's client ID and secret from **My Apps** > **View Connections** after the tenant connects your app. Then create the connection with those values instead of asking the customer.
+- **Credentials you generate yourself.** If you selected **I, the app developer, will configure the credentials on behalf of each tenant**, generate each tenant's client ID and secret from **My Apps** > **View Connections** after the tenant connects your app. Then create the connection with [headless auth](/guides/auth/customize-connect-ui#use-the-frontend-sdk-for-headless-auth): call `nango.auth()` with `client_id` and `client_secret` in `credentials` and `tenantId` in `params`. The app key still comes from the connect session.
 - **One connection per tenant.** ServiceTitan issues a client ID and secret per tenant. Organizations with several tenants connect each one separately.
 
 For more details, see [ServiceTitan's API documentation](https://developer.servicetitan.io/docs/welcome/).

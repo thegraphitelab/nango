@@ -13,7 +13,7 @@ Connect to a ServiceTitan integration environment tenant with Nango and see data
     In Nango ([free signup](https://app.nango.dev)), go to [Integrations](https://app.nango.dev/dev/integrations) -> _Configure New Integration_ -> _ServiceTitan (Sandbox)_.
     </Step>
     <Step title="Authorize ServiceTitan">
-    Go to [Connections](https://app.nango.dev/dev/connections) -> _Add Test Connection_ -> _Authorize_, then enter the integration environment tenant's **Client ID**, **Client Secret**, and **Tenant ID**, plus your app's **App Key**. Later, you'll let your users do the same directly from your app.
+    ServiceTitan needs your app key on every call, and the Connect UI never shows that field. [Create a connect session](/reference/backend/http-api/connect/sessions/create) with your app key in `integrations_config_defaults` (see [Pre-fill the app key](/api-integrations/servicetitan/how-to-register-your-own-servicetitan-app#prefill-app-key)), open the Connect UI with its token, then enter the integration environment tenant's **Client ID**, **Client Secret**, and **Tenant ID**. Later, you'll let your users do the same directly from your app.
     </Step>
     <Step title="Call the ServiceTitan API">
     Let's make your first request to the ServiceTitan API. Replace the placeholders below with your [Environment API key](/reference/backend/http-api/api-keys), [integration ID](https://app.nango.dev/dev/integrations), [connection ID](https://app.nango.dev/dev/connections), and the connection's tenant ID:
@@ -68,7 +68,7 @@ Connect to a ServiceTitan integration environment tenant with Nango and see data
 Nango maintained guides for common use cases.
 
 - [How to register your own ServiceTitan app](/api-integrations/servicetitan/how-to-register-your-own-servicetitan-app)
-Register an app in the ServiceTitan Developer Portal, get your app key, and pre-fill it in connect sessions
+Register an app in the ServiceTitan Developer Portal, get your app key, and set it in connect sessions
 
 - [How do I link my account?](/api-integrations/servicetitan-sandbox/connect)
 Generate a client ID and secret in ServiceTitan and find your tenant ID
@@ -78,7 +78,7 @@ Official docs: [ServiceTitan API docs](https://developer.servicetitan.io/docs/we
 ## 🔌 Calling the ServiceTitan API
 
 - **Tenant in the path.** ServiceTitan endpoints look like `/<module>/v2/tenant/<TENANT-ID>/<resource>`, for example `/jpm/v2/tenant/<TENANT-ID>/jobs`. Nango stores the tenant ID on the connection as `tenantId`.
-- **App key header.** ServiceTitan requires an `ST-App-Key` header on every call. Nango adds it from the connection's `appKey`, so you don't send it yourself.
+- **App key header.** ServiceTitan requires an `ST-App-Key` header on every call. Nango adds it from the connection's `appKey`, which you set in the connect session. End users never see it.
 - **Access tokens.** ServiceTitan uses the OAuth 2.0 client credentials grant. Tokens last 15 minutes, and Nango fetches a new one when needed.
 - **Rate limits.** When ServiceTitan returns `429`, Nango waits for the `Retry-After` header before retrying.
 - **Multiple tenants.** ServiceTitan issues a client ID and secret per tenant, so the usual setup is one Nango connection per tenant. If an organization's tenants share one client ID and secret, one connection can call each of those tenants by putting that tenant's ID in the path.
